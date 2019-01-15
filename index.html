@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="no">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="viewport" content="width=device-width">
+
+    <title>ian11App</title>
+    <link rel="stylesheet"
+             href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      >
+      <link href="https://cdn.jsdelivr.net/npm/quasar-framework@^0.17.0/dist/umd/quasar.mat.min.css" rel="stylesheet" type="text/css">
+</head>  
+ <style type="text/css">
+        [v-cloak] {display: none;}
+        .cap-tabel{
+        color: goldenrod;
+        background-color: dimgrey;
+        }
+        .negru-text{
+            color: black;
+        }
+        .cardu-alb{
+          background-color: white;
+          color: black;
+        }
+        .cardu-sea{
+          background-color: darkseagreen;
+          color: black;
+         
+        }
+     
+     .icsel{
+         font-size: x-large;
+         color:darkblue;
+     }
+     .txt-b-salv{
+         color: darkblue;
+     }
+     .txt-titlu{
+         color: white;
+     }
+     .txt-ls-cant{
+         color: white;
+     }
+     .txt-ls-pret{
+         color: white;
+     }
+     
+    </style>
+  
+
+<body>
+<div id="q-app" style="background-color: wheat" 
+                v-cloak
+>
+<q-layout view="lhh lpR ffF"  
+          style="min-height: 60vh; min-width: 60vw;"
+>
+    <q-layout-footer>
+      <q-toolbar color="amber-6" 
+                 style="min-height: 0px; padding: 0px;"
+      >
+    
+         <q-item dense>
+            <q-item-side>  
+                <q-btn flat 
+                       round 
+                       dense 
+                       @click="drawerState = !drawerState" 
+                       icon="menu" 
+                       color="black" >
+                </q-btn>
+            </q-item-side>        
+            <q-item-main dense>
+                <q-toolbar-title>
+                      <q-input type="number"
+                             v-model="cautare" 
+                             v-show='viuz.vizibil.inputCautare'
+                             placeholder='Cauta dupa pret '
+                             clearable 
+                             clear-value
+                             text-color='black'
+                             ></q-input>
+                </q-toolbar-title>  
+            </q-item-main>
+            <q-item-side right>
+                <strong> | </strong> 
+               <strong style="color:red;"
+                >{{lungFilteredList}} </strong>produse
+               <strong> | </strong> 
+            </q-item-side>
+         </q-item>
+        
+      </q-toolbar>
+    </q-layout-footer>
+
+    <q-page-container >              
+        <q-page id='pagina-continut'
+                class="full-width"
+        >
+            <div id='viuuEditCatalogDREAPTA'  
+                 v-show='viuz.vizibil.editCatalog'
+                 text-color="black"
+            ><div style="padding-top: 10px; padding-left: 35px;">
+                <strong>Editare Catalog</strong>
+            </div>
+   <!-- card Form Editare Caatlog -->             
+     <q-card class="q-ma-sm"
+                 color='white'
+     >
+        <q-list>
+            <q-item dense>  
+                 <q-item-side>  <!-- input nume -->
+                    <q-input 
+                         v-model.trim="edc.nume" 
+                         @keyup='editClgValidare'
+                         @clear='editClgValidare'
+                         type='text'
+                         placeholder='Denumire produs:'
+                         clearable 
+                         clear-value
+                         text-color='black'
+                         ></q-input>
+                    </q-item-side>
+                <q-item-main></q-item-main>
+                                    <!-- buton - salveaza/sterge -->
+                 <q-item-side v-show='viuz.vizibil.removeItem'   
+                 >
+                    <q-btn label=''
+                           icon='delete'
+                           color='red'
+                           dense
+                           @click='scotDBclg()'
+                           round
+                           size='lg'
+                          
+                    ></q-btn> <!--  v-show='viuz.vizibil.removeItem' 
+                                   -->
+                 </q-item-side>
+                <q-item-side v-show='viuz.vizibil.btnAddItemCtg'
+                >                 
+                    <q-btn icon='add'
+                           color='green'
+                           dense
+                           round
+                           size='lg'
+                           @click="adaugItemEditatClg()" 
+               
+                    ></q-btn> <!--  v-show='viuz.vizibil.removeItem' 
+                                        @click='scotIduClg'  
+                                    @click='adaugItemEditatClg()'
+                                -->
+                </q-item-side>
+            </q-item>
+         
+            
+            <q-item dense>
+                <q-item dense><!-- input pret -->
+                     <q-input 
+                         v-model="edc.pret" 
+                         @keyup='editClgValidare'
+                         @clear='editClgValidare'
+                         type='number'
+                         placeholder='Pret:'
+                         clearable 
+                         clear-value
+                         ></q-input>
+                </q-item>
+                <q-item dense> <!-- input cantitate -->
+                     <q-input 
+                         v-model="edc.cant" 
+                         @keyup='editClgValidare'
+                         @clear='editClgValidare'
+                         type='number'
+                         placeholder='Cant:'
+                         clearable 
+                         clear-value
+
+                         ></q-input>
+                </q-item>
+            </q-item>
+          </q-list>   
+        </q-card>
+                                   <!-- viuz.vizibil.btnAddItemCtg -->
+
+            </div> <!-- end: viuuEditCatalogDREAPTA --> 
+            
+            
+            
+
+            <div id='viuuListSelect'  v-show='viuz.vizibil.listSelect'
+            >
+              <!-- items list --> 
+                <q-card class="q-ma-sm"
+                        color='light-green-4'
+                >
+                <q-list inset-separator
+                        striped
+                        class='q-ma-xs'
+                >
+                    <q-item id='sagetile'
+                        dense
+                    >
+                       <q-item-side>
+                         <q-item dense
+                            style='background-color:  aliceblue; color:black; margin-left: -15px;'
+                           >  
+                           <strong>T : {{totalizareClg.cant}}</strong> buc |
+                           <strong> |  {{totalizareClg.valoare}}</strong> lei
+                         </q-item>
+                       </q-item-side>
+                       <q-item-main></q-item-main>
+                       <q-item-side right>
+                                <q-btn icon='keyboard_arrow_left'
+                                       color='black'
+                                       size='sm'
+                                       @click='minus1page()'
+                                ></q-btn>
+                                <span class='negru-text'>{{aPage+1}} din {{uPage+1}}</span>
+                                <q-btn icon='keyboard_arrow_right'
+                                       color='black'
+                                       size='sm'
+                                       @click='plus1page()'
+                                ></q-btn>
+                       </q-item-side>
+                   </q-item>
+
+                        
+                <!-- titlu lista-->        
+                    <q-item dense
+                            style='background-color: seashell; color:black;'
+                    >   
+                          <q-item-side>
+                               <strong class='negru-text'
+                                       style="margin-left: -15px;}"
+                               >Cant.</strong>
+                               </q-item-side>
+                          <q-item-main>
+                              <strong style="margin-left: -15px;}">Denumire</strong>
+                              </q-item-main>
+                          <q-item-side right>
+                              <strong class='negru-text'>Pret</strong>
+                              </q-item-side>
+                    </q-item>
+
+
+        <!-- list items -->
+                    <q-item v-for='(i,idx) in pagItems'
+                            v-on:click.native='comutaSelect(idx,i.idClg)'
+                            style="padding: 0px; min-height: 30px;"
+                    >           <!-- v-show='viuz.vizibil.arataStoc' style="padding: 0px;"-->
+                      <q-item-side v-show='true'
+                                   right 
+                                   class='negru-text'
+                      ><strong>{{i.cant}} x</strong>
+                      </q-item-side>
+                      <q-item-main class='negru-text'>
+                        <strong>{{i.nume}} - prd: {{i.idClg}}</strong>
+                      </q-item-main>
+                      <q-item-side >
+                          <q-item dense
+                          >
+                          <q-item-side :icon='semnu_grafic' 
+                                      :color='culoare' 
+                                      v-show='i.bifat'
+                                      right
+                           ></q-item-side>
+                           <q-item-side class='negru-text'
+                                      style='margin-left:0px;'
+                           >
+                             <strong>{{i.pret}}</strong>lei
+                             </q-item-side>
+                         
+                    </q-item>
+                        </q-item-side>
+                    </q-item> 
+
+            </q-list>
+            
+               </q-card> 
+
+            </div> <!-- end: viuuListSelect --> 
+
+
+        </q-page>
+
+    <!-- FAB -->
+         <q-page id='bxFab' 
+                 padding
+                 v-show='viuz.vizibil.boxFab'
+         >                 
+                            <!-- viuz.vizibil.boxFab -->
+                <q-page-sticky position="bottom-left" :offset="[20, 20]">
+                   <q-fab
+                     icon="fingerprint"
+                     direction="up"
+                     color="info"
+                     size='md'
+                   >
+                        <q-fab-action @click="schimbaViuu(oListViuuz.bxSelectare)" 
+                                      color="green" 
+                                      class="white" 
+                                      icon="check_box" ></q-fab-action>
+                        <q-fab-action @click="schimbaViuu(oListViuuz.bxCarutz)" 
+                                      icon="shopping_cart"
+                                      color="red" 
+                                      class="white" 
+                                      ></q-fab-action>
+                        <q-fab-action @click="schimbaViuu(oListViuuz.bxIstoric)" 
+                                      icon="history" 
+                                      color="blue" 
+                                      class="white" 
+                                      ></q-fab-action>
+                   </q-fab>
+                </q-page-sticky>
+        </q-page>
+    </q-page-container>
+    
+</q-layout>
+</div>
+    
+</body>
+
+<script src="https://www.gstatic.com/firebasejs/5.5.9/firebase.js"></script>
+<!-- Firebase App is always required and must be first -->
+<script src="https://www.gstatic.com/firebasejs/5.5.9/firebase-app.js"></script>
+
+<!-- Add additional services that you want to use -->
+<script src="https://www.gstatic.com/firebasejs/5.5.9/firebase-database.js"></script>
+
+<!-- Comment out (or don't include) services that you don't want to use -->
+<!-- <script src="https://www.gstatic.com/firebasejs/5.5.9/firebase-storage.js"></script> -->
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@latest/dist/vue.min.js"></script>   
+    <script src="https://cdn.jsdelivr.net/npm/quasar-framework@^0.17.0/dist/umd/quasar.mat.umd.min.js"></script>
+    <script src="utile.js"></script> 
+    
+
+<script>
+   
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyCoyUgOYtvvXRkeaw_17_gRHMaCJKcSB1U",
+    authDomain: "daestillideme.firebaseapp.com",
+    databaseURL: "https://daestillideme.firebaseio.com",
+    projectId: "daestillideme",
+    storageBucket: "daestillideme.appspot.com",
+    messagingSenderId: "381046031632"
+  };
+  firebase.initializeApp(config);
+</script>
+      
+<script>
+   
+    // end teste
+    const rootRef=firebase.database().ref(),
+          rootUserList=firebase.database().ref('daeInput')
+      
+    
+    var aplic=new Vue({
+        el: '#q-app',
+        data: function () {
+              return{
+                datautiliz: new Date(),
+                drawerState: true,
+                semnu_grafic:"done",
+                culoare:'red',
+                cautare:'',
+                istFiltru:'',
+                ultCautare:'x',
+                catalog:[],//ao51,
+                arrSelectate:[],idSelectate:[],idUnuSelectat:null,
+                viuz : {},
+                itemsFilteredList:[], lungFilteredList:0,
+                aPage: 0, uPage:0, ipp: 5 , //arrCantitate:[],
+                // carutzStateGol:true,
+                udcTrigger:true, //triger pt computed.updateCantitate
+                tCarutz:{},
+                selectActivitate:'sale',
+                activitati:dateleActivitati,
+                dIstoric:[],
+                rtrCarutz:false, //rtr - ready to render
+                lastSaveCarutz:'',
+                primuDeschis:true,
+                aao:[],arrSalvate10:[],dataArrSalvate10:[],
+                arrChildOrdCrr:[],//arr cu ordinea cararilor din ult10salvate
+                iSalvCrr:{},inSalvArrViuu:{},itUlt10:0,//itUlt10=iterator Ultimele 10
+                nouSalv:true,maxUltSalvList:4,
+                dCopac:[],labelExpandat:['2018']
+                ,tmpCopac:{}
+                ,edc:{nume:'', pret:'', cant:''}//editare catalog v-model
+                ,arrViuuz:[] ,multipleSelectState:false ,disabledBtnClgAdd:true//butonul catalog add
+                ,caic:1 //contor adaug  items catalog
+                ,obectLista:{}
+                ,rtClgList:true
+                ,itemClgNOU:false
+                ,unuAddClg:false
+                ,totalizareClg:{}
+              }
+        },
+        watch:{
+            datautiliz:function(){ 
+                    let ob={}
+                    ob[lsDselectata]=this.datautiliz
+                rootRef.update(ob);
+            }
+        },
+        created (){
+            let asta=this
+                
+            function ascultaAdaugareElement(ref){
+                ref.on('child_added', snapshot => { 
+                let val=snapshot.val()
+                    ,itemClg={...val.dItem,idKey:val.idKey}
+                            //,itemClg={...val.dItem,idKey:val.idKey,idClg:asta.caic++}
+                itemClg.pret=itemClg.pret
+                itemClg.cant=itemClg.cant
+                  
+                 asta.catalog.unshift(itemClg)
+                asta.resetClgUnuBifat()
+           
+                if (asta.unuAddClg) asta.notificare('ADAUGAT in catalog')
+                // this.rtClgList=!this.rtClgList   
+                    this.cautare='' 
+                    asta.itemClgNOU=true
+
+                })  
+            }
+            
+                this.ipi = new PropItems(dButonActivitati.id) //ipi - instanta ob class PropItems
+                this.ipi.adNprop('nIcon', dButonActivitati.nIcon)
+                this.ipi.adBooProp('vizibil')
+                this.ipi.setActive('vizibil',oListViuuz.cgSelectare)
+                 this.idActiv=0
+                this.viuz=this.ipi.od
+            
+            ascultaAdaugareElement(rootUserList)
+            
+            rootUserList.on('child_removed', (ss) => {
+                this.scotArrClg()
+               this.cautare='' 
+                this.itemClgNOU=true
+                this.notificare(' .. STERS din catalog')
+                this.getEDC_set0(0)
+                this.viuz.vizibil.removeItem=false
+                this.idUnuSelectat=null
+            })
+           
+         
+      
+    },
+        methods: {
+          comutaSelect:function(idx,idClg){
+              let idu=this.idUnuSelectat
+                  ,clg=this.catalog
+                  ,xac=this.idxArrCatalog=this.catalog.length-idClg
+                  ,edc=this.edc
+            
+              if (this.multipleSelectState) {
+                  clg[idClg].bifat=!clg[idClg].bifat
+                  this.idSelectate.comuta(idClg)
+                  this.rtrCarutz=true
+              }else{ // catalog-ListaSelect
+                   if (idu!=null) clg[idu].bifat=false
+                   if (idu!=xac) {
+                      clg[xac].bifat=true
+                      this.idUnuSelectat=xac
+                      edc.nume=clg[xac].nume
+                      edc.pret=clg[xac].pret         
+                      edc.cant=clg[xac].cant       
+                       this.viuz.vizibil.btnAddItemCtg=false
+                      this.viuz.vizibil.removeItem=true
+                  }else{
+                        /* edc.nume=''
+                              edc.pret=''
+                          edc.cant=''  
+                      //this.viuz.vizibil.btnAddItemCtg=false
+                      */
+                      this.getEDC_set0(0)
+                      this.viuz.vizibil.removeItem=false
+                      this.idUnuSelectat=null
+                  }
+                  
+              }
+          },
+          schimbaViuu:function(arrViuuId){
+            //diverse operatii specifice fiecarui Viuu
+              arrViuuId.forEach((e) => {
+                  if (e=='carutz') this.setCarutz()
+                  if (e=='istoric') this.setIstoricTree()
+              })
+              
+            // seteaza Active anumite Viuu
+              this.ipi.setActive('vizibil',arrViuuId)
+            
+          },
+          plus1page:function(){
+              if (this.aPage<this.uPage)
+                        this.aPage++
+              //this.setPageItems()
+          },
+          minus1page:function(){
+              if (this.aPage>0)
+              this.aPage--
+          },
+        setIdClg:function(){//update in catalog[] k(idClg)
+            let lc=this.catalog.length
+            this.catalog.forEach((e) => {
+                e['idClg']=lc--
+            })
+        },
+          setPageItems:function(){
+                 let pItem,uItem,upg,rest,
+                     lungFL=this.lungFilteredList,
+                     ipg=this.ipp,
+                     apg=this.aPage,
+                     rezP=[]
+                        
+                        pItem=apg*ipg    
+                        uItem=pItem+ipg 
+                        
+                 
+                     if (lungFL>ipg){
+                            rest=lungFL%ipg
+                            upg=(lungFL-rest)/ipg
+                            }else{
+                                upg=0
+                                rest=lungFL
+                            }
+                     if (apg==upg) uItem=pItem+rest;
+              
+                     for (var i=pItem; i<uItem ; i++){
+                        rezP.push(this.itemsFilteredList[i])
+                     }
+
+                 //   this.lungFilteredList=lungFL
+                    this.uPage=upg
+            return rezP;
+
+          
+         },
+          filteredItems: function(){
+                this.itemsFilteredList=this.catalog.filter((item) => {
+                    if (this.cautare==null) this.cautare=''
+                    let rez=item.pret.toString().match(this.cautare);
+                   
+                    return rez;
+                });    
+              this.ultCautare=this.cautare
+            },
+          resetBifate:function(){
+             /* this.arrSelectate.forEach((e) => {
+                  e.cantitate=1
+              })
+             */
+              this.arrSelectate=[]
+              this.idSelectate.forEach(e=>{ //de bifare toate id-urile bifate
+                  this.catalog[e].bifat=!this.catalog[e].bifat
+              })
+              this.idSelectate=[]
+          },
+          resetClgUnuBifat(){
+              let idu=this.idUnuSelectat
+              if (idu) {
+                  let clg=this.catalog
+                  if (clg[idu].bifat) this.catalog[idu].bifat=false
+                
+                  this.idUnuSelectat=null
+              }
+            }
+          ,getEDC_set0(x){
+                let orez={}
+                if (x!=0){
+                    orez={
+                        nume:this.edc.nume
+                        ,pret:this.edc.pret
+                        ,cant:this.edc.cant
+                    }
+                    return orez
+                }else{
+                     this.edc.nume=''
+                     this.edc.pret=''
+                     this.edc.cant=''
+                }
+            }
+          ,getXelmActvt(carare,idK,arrDest){//ex carare="istoric/2019/Sep/5/sale/items/0"
+              let dataCrr=this.dataArrSalvate10
+                  ,crr=getScurtCrr(carare,0,crrNivActvt)
+                  ,xItem=getScurtCrr(carare,6,6)
+                  
+              
+              firebase.database().ref(crr).once('value').then(ss => {
+                  aplic.itUlt10--
+                  let d=ss.val()
+                      ,i=aplic.itUlt10
+                      ,xItem=dataCrr[i].xItem
+                      ,VxItem=d.items[xItem]
+                      ,arrId=VxItem.id
+                      ,iak=getObKarrId(arrId,idK,aplic.catalog)//itemsArrk
+                      ,okav={...iak,...VxItem}
+                      ,continut=okavTOaokv(okav)
+                      ,titlu='lei | '+ d.activitate+' | '+d.zla
+                      ,elmCard={}
+                  
+                  elmCard['titlu']=titlu
+                  elmCard['continut']=continut
+                  
+                  arrDest.adaug(elmCard)
+            })
+          }
+          ,editClgValidare:function(d){
+                let edc=this.edc
+                if (edc.pret==null)  edc.pret=''
+                if (edc.cant==null)  edc.cant=''
+                let pretValid=(edc.pret!='')
+                    ,numeVaild=(edc.nume!='')
+                    ,cantVaild=(edc.cant!='')
+                    ,toate3Valide=numeVaild && pretValid && cantVaild
+                   
+                if (toate3Valide){
+                    this.viuz.vizibil.btnAddItemCtg=true
+                    this.viuz.vizibil.removeItem=false
+                }else{
+                        this.viuz.vizibil.btnAddItemCtg=false
+                         }
+          }  
+          ,apasatBtnClgAdd(){
+              if (this.idUnuSelectat) {
+                          
+               }else{
+                   this.adaugItemEditatClg()
+               }
+          }
+          ,adaugItemEditatClg(){ //
+              let nouItem=rootUserList.push()
+                  ,orez=this.getEDC_set0()
+                  
+                  nouItem.set({dItem:orez
+                               ,idKey:nouItem.key
+                             })
+              this.getEDC_set0(0)
+              this.viuz.vizibil.btnAddItemCtg=false
+              this.unuAddClg=true
+          }
+          ,modificXitem(id){
+              
+          }
+          ,scotDBclg(){
+              let xac=this.idxArrCatalog
+                  ,idk=this.catalog[xac].idKey
+              rootUserList.child(idk).remove()
+            }
+          ,scotArrClg(){
+              let xac=this.idxArrCatalog
+              this.catalog.splice(xac,1)
+          }
+                        ,XXXadaugItemEditatClg(){ 
+                              let lung=this.catalog.length
+                                  ,orez={}
+
+                              orez['id']=lung
+                              orez['nume']=this.edc.nume
+                              orez['pret']=this.edc.pret
+                              this.adaugItemXclg(lung,orez)
+
+                              this.edc.nume=''
+                              this.edc.pret=''
+                              this.resetClgUnuBifat()
+          }
+          ,adaugItemXclg(X,oItem){
+                let carare='/'+X
+                  ,upOb={}
+                upOb[carare]=oItem
+                refInit.update(upOb)
+            }
+          
+          ,initViuuCatalog(){
+              this.schimbaViuu(oListViuuz.cgSelectare)
+              this.resetBifate()
+              this.multipleSelectState=false
+              this.drawerState=false
+          }
+          ,initViuuLocatie(){
+              this.resetClgUnuBifat()
+             
+              
+              this.schimbaViuu(oListViuuz.bxSelectare)
+              this.multipleSelectState=true
+              this.drawerState=false;
+          }
+          ,notificare(mesaj){
+              this.$q.notify({
+                color:'negative',
+                message:mesaj,
+                position:'left',
+                timeout:2000
+              })
+          }
+          
+        },
+        computed: {
+          pagItems:function(){
+            if (this.catalog.length>0){
+              if ((this.cautare!=this.ultCautare) || (this.itemClgNOU==true )) {
+
+                        this.aPage=0
+                        this.filteredItems()
+                        this.lungFilteredList=this.itemsFilteredList.length
+                  this.itemClgNOU=false
+                    }
+             this.setIdClg()
+             this.totalizareClg=totLista(this.itemsFilteredList,['cant','pret'],'valoare','cant')
+                    return this.setPageItems()
+                }
+            }
+            ,rfshClgList:function(){
+                this.rtClgList=!this.rtClgList
+                this.pagItems()
+            }
+            
+            
+        }
+      })
+    
+</script>
+    
+</html>
+
+
+<!--
+------------------------------------
+ let ad=[
+        {cant:3,pret:25},
+        {cant:8,pret:45},
+        {cant:12,pret:50},
+        {cant:15,pret:65},
+        {cant:5,pret:35},
+        {cant:7,pret:49}
+    ]
+    
+    let testrez=totLista(ad,['cant','pret'],'valoare','cant')
+-----------------------------------
+tanganetzi  bleizare  jersee budigai shtrampi tricoaie gomlek
+-----------------------------------
+    issues: cgButonAdaug - de sters style padding
+-->
+
+
