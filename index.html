@@ -7,7 +7,7 @@
     <meta name="msapplication-tap-highlight" content="no">
     <meta name="viewport" content="width=device-width">
 
-    <title>catalog</title>
+    <title>Catalog</title>
     <link rel="stylesheet"
              href="https://fonts.googleapis.com/icon?family=Material+Icons"
       >
@@ -205,13 +205,13 @@
                         dense
                     >
                        <q-item-side>
-                         <q-item dense
+                            <q-item dense
                             style='background-color:  aliceblue; color:black; margin-left: -15px;'
                            >  
                            <strong>T : {{totalizareClg.cant}}</strong> buc |
                            <strong> |  {{totalizareClg.valoare}}</strong> lei
                          </q-item>
-                       </q-item-side>
+                        </q-item-side>
                        <q-item-main></q-item-main>
                        <q-item-side right>
                                 <q-btn icon='keyboard_arrow_left'
@@ -258,7 +258,7 @@
                       ><strong>{{i.cant}} x</strong>
                       </q-item-side>
                       <q-item-main class='negru-text'>
-                        <strong>{{i.nume}} - prd: {{i.idClg}}</strong>
+                        <strong>{{i.nume}} </strong>
                       </q-item-main>
                       <q-item-side >
                           <q-item dense
@@ -354,10 +354,11 @@
 </script>
       
 <script>
-   
+
     // end teste
     const rootRef=firebase.database().ref(),
           rootUserList=firebase.database().ref('daeInput')
+          //lungList=rootUserList.once()
       
     
     var aplic=new Vue({
@@ -418,7 +419,6 @@
                             //,itemClg={...val.dItem,idKey:val.idKey,idClg:asta.caic++}
                 itemClg.pret=itemClg.pret
                 itemClg.cant=itemClg.cant
-                  
                  asta.catalog.unshift(itemClg)
                 asta.resetClgUnuBifat()
            
@@ -731,19 +731,7 @@
 
 
 <!--
-------------------------------------
- let ad=[
-        {cant:3,pret:25},
-        {cant:8,pret:45},
-        {cant:12,pret:50},
-        {cant:15,pret:65},
-        {cant:5,pret:35},
-        {cant:7,pret:49}
-    ]
-    
-    let testrez=totLista(ad,['cant','pret'],'valoare','cant')
------------------------------------
-tanganetzi  bleizare  jersee budigai shtrampi tricoaie gomlek
+tanganetzi  bleizar  jerseu budigai shtrampi
 -----------------------------------
     issues: cgButonAdaug - de sters style padding
 -->
